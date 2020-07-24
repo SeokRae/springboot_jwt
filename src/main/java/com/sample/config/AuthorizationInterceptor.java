@@ -64,6 +64,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                     response.addHeader("Authorization", "Bearer " + newAccessToken);
                 } else {
                     /* 리프레시 토큰의 오류인 경우 -> 로그인 필요 */
+                    log.error("[JWT RefreshTokenException] 리프레시 토큰 만료 -> 자원 접근 불가 (로그인 필요)");
                     return false;
                 }
 

@@ -35,6 +35,6 @@ public class AccessTokenService {
                     acToken.updateToken(accessToken);
                     return acToken.getAccessToken();
                 })
-                .orElseThrow(() -> { throw new RuntimeException("데이터가 없습니다."); });
+                .orElseGet(() -> { throw new RuntimeException("데이터가 없습니다."); });
     }
 }
