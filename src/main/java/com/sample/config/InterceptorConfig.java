@@ -43,6 +43,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                         "/account/add/**"       /* 사용자 등록 시 인증 및 권한 필요 없음             */
                         , "/account/all"        /* 사용자 조회 시 인증 및 권한 필용 없음             */
                         , "/auth/login/**"      /* 사용자 로그인 페이지 접근 시 권한 확인 필요 없음     */
+                        , "/account/update/**"  /* 사용자 정보 업데이트 URL 호출                   */
                 );
         WebMvcConfigurer.super.addInterceptors(registry);
     }

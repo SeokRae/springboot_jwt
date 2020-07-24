@@ -28,4 +28,9 @@ public class AccountController {
     public List<Account> all() {
         return accountService.list();
     }
+
+    @GetMapping("/redirect")
+    public String redirect() {
+        return "{\"url\":\"redirect\"}";
+    }
 }

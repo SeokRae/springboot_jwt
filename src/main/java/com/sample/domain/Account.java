@@ -3,6 +3,7 @@ package com.sample.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +17,8 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Account {
+@ToString
+public class Account extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

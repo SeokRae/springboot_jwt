@@ -25,6 +25,10 @@ public class JwtUtils {
     private static final String SUBJECT = "/auth/login";
     private static final String AUDIENCE = "client";
 
+    public static final Integer DEFAULT_EXPIRED = 0;
+    public static final Integer ACCESS_EXPIRED = 1;
+    public static final Integer REFRESH_EXPIRED = 5;
+
     private Key key;
 
     public JwtUtils(String secret) {
@@ -38,7 +42,7 @@ public class JwtUtils {
      * @param account 현 프로젝트의 사용자 Entity
      * @return JWT { Header.Payload.Signature } 반환
      */
-    public String generateJwtToken(Account account) {
+    public String generateToken(Account account, Integer plusMinutes) {
         return Jwts.builder()
                 // JWT -> Header 생성 부분
                 .setHeader(createHeader()) // 토큰의 타입 명시
@@ -50,8 +54,8 @@ public class JwtUtils {
                 .setIssuer(ISSUER) // 토큰 발급
                 .setSubject(SUBJECT) // 토큰 제목
                 .setAudience(AUDIENCE) // 토큰 대상자
-                .setIssuedAt(createExpiredDateForOneYear(0)) // 토큰 발생 시간
-                .setExpiration(createExpiredDateForOneYear(5)) // 만료시간
+                .setIssuedAt(createDate(DEFAULT_EXPIRED)) // 토큰 발생 시간
+                .setExpiration(createDate(plusMinutes)) // 만료시간
 
                 .compact();
     }
@@ -59,14 +63,14 @@ public class JwtUtils {
     /**
      * @return 만료일자 반환
      */
-    private Date createExpiredDateForOneYear(int plusTime) {
+    private Date createDate(int plusTime) {
         Date date = Date.from(
                 LocalDateTime.now()
                         .plusMinutes(plusTime)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
         );
-        log.info("Token 3: createExpiredDateForOneYear: {}", date.getTime());
+        log.info("Token 3: create{}: {}", (plusTime == DEFAULT_EXPIRED ? "issueAt Time" : "expireAt Time"), date.getTime());
         return date;
     }
 
@@ -115,7 +119,7 @@ public class JwtUtils {
      * @param token JWT의 Payload 값
      * @return payload에서 현재 프로젝트에서 설정한 사용자 값을 구분하는 값인 userEmail을 반환
      */
-    private String getUserNameFromToken(String token) {
+    public String getUserNameFromToken(String token) {
         /* 복호화된 Payload로 id 확인 */
         Claims claims = getClaimsFormToken(token);
         return (String) claims.get("id");
@@ -142,7 +146,7 @@ public class JwtUtils {
             log.info("requestToken : {}", token);
             Claims claims = getClaimsFormToken(token);
             log.info("claims : {}", claims);
-            log.info("expireTime : {}", claims.getExpiration().getTime()); // time은 정해진 포맷이 있어야 할 것 같은데 ?
+            log.info("expireTime : {}", Date.from(claims.getExpiration().toInstant())); // time은 정해진 포맷이 있어야 할 것 같은데 ?
             log.info("Id :" + claims.get("id"));
             log.info("Audience :" + claims.getAudience());
             log.info("Issuer :" + claims.getIssuer());

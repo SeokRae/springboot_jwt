@@ -2,6 +2,7 @@ package com.sample.service;
 
 import com.sample.domain.Account;
 import com.sample.domain.AccountRepository;
+import com.sample.domain.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,11 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public Account add(String userName, String userPw) {
-        return accountRepository.save(Account.builder().userName(userName).userPw(userPw).build());
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
+    public void add(String userName, String userPw) {
+        accountRepository.save(Account.builder().userName(userName).userPw(userPw).build());
     }
 
     public Account update(String userName) {
@@ -32,9 +36,15 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Account get(String name, String pw) {
         Account account = accountRepository.findByUserNameAndUserPw(name, pw);
         log.info("account : {}", account);
         return account;
+    }
+
+    /* 유저네임으로 사용자 조회 */
+    public Account getAccountByUserName(String userName) {
+        return accountRepository.findByUserName(userName);
     }
 }
