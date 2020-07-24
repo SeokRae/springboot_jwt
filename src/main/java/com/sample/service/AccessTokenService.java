@@ -1,7 +1,7 @@
 package com.sample.service;
 
-import com.sample.domain.AccessToken;
-import com.sample.domain.AccessTokenRepository;
+import com.sample.domain.access.AccessToken;
+import com.sample.domain.access.AccessTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +29,8 @@ public class AccessTokenService {
     }
 
     @Transactional
-    public void update(String userName, String accessToken) {
-        accessTokenRepository.findByUserName(userName)
+    public String update(String userName, String accessToken) {
+        return accessTokenRepository.findByUserName(userName)
                 .map(acToken -> {
                     acToken.updateToken(accessToken);
                     return acToken.getAccessToken();

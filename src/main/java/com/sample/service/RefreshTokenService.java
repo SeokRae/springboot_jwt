@@ -1,7 +1,7 @@
 package com.sample.service;
 
-import com.sample.domain.RefreshToken;
-import com.sample.domain.RefreshTokenRepository;
+import com.sample.domain.refresh.RefreshToken;
+import com.sample.domain.refresh.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

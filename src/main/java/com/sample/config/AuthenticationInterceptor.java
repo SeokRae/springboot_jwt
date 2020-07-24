@@ -3,7 +3,7 @@ package com.sample.config;
 import com.sample.component.JwtConst;
 import com.sample.component.JwtUtils;
 import com.sample.component.StringUtils;
-import com.sample.domain.Account;
+import com.sample.domain.account.Account;
 import com.sample.service.AccessTokenService;
 import com.sample.service.AccountService;
 import com.sample.service.RefreshTokenService;

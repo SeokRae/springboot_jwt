@@ -1,6 +1,6 @@
 package com.sample.component;
 
-import com.sample.domain.Account;
+import com.sample.domain.account.Account;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -24,10 +24,6 @@ public class JwtUtils {
     private static final String ISSUER = "seok";
     private static final String SUBJECT = "/auth/login";
     private static final String AUDIENCE = "client";
-
-    public static final Integer DEFAULT_EXPIRED = 0;
-    public static final Integer ACCESS_EXPIRED = 1;
-    public static final Integer REFRESH_EXPIRED = 5;
 
     private Key key;
 
@@ -54,7 +50,7 @@ public class JwtUtils {
                 .setIssuer(ISSUER) // 토큰 발급
                 .setSubject(SUBJECT) // 토큰 제목
                 .setAudience(AUDIENCE) // 토큰 대상자
-                .setIssuedAt(createDate(DEFAULT_EXPIRED)) // 토큰 발생 시간
+                .setIssuedAt(createDate(JwtConst.DEFAULT_EXPIRED)) // 토큰 발생 시간
                 .setExpiration(createDate(plusMinutes)) // 만료시간
 
                 .compact();
@@ -70,7 +66,7 @@ public class JwtUtils {
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
         );
-        log.info("Token 3: create{}: {}", (plusTime == DEFAULT_EXPIRED ? "issueAt Time" : "expireAt Time"), date.getTime());
+        log.info("Token 3: create{}: {}", (plusTime == JwtConst.DEFAULT_EXPIRED ? "issueAt Time" : "expireAt Time"), date.getTime());
         return date;
     }
 

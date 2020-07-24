@@ -1,4 +1,4 @@
-package com.sample.domain;
+package com.sample.domain.refresh;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

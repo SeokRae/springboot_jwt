@@ -1,6 +1,6 @@
 package com.sample.controller;
 
-import com.sample.domain.Account;
+import com.sample.domain.account.Account;
 import com.sample.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

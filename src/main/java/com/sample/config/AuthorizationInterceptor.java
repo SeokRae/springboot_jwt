@@ -2,8 +2,8 @@ package com.sample.config;
 
 import com.sample.component.JwtConst;
 import com.sample.component.JwtUtils;
-import com.sample.domain.AccessToken;
-import com.sample.domain.Account;
+import com.sample.domain.access.AccessToken;
+import com.sample.domain.account.Account;
 import com.sample.service.AccessTokenService;
 import com.sample.service.AccountService;
 import com.sample.service.RefreshTokenService;
@@ -15,10 +15,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * 인터셉터에서 jwt 토큰 처리 로직 구현
- * 1. 로그인
- */
 @Slf4j
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
@@ -39,29 +35,24 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 .replace("Bearer ", "");
 
         if(!jwtUtils.isValidToken(accessToken)) {
-
             log.error("[JWT ExpiredJwtException] 발생 -> AccessToken 재발행 프로세스 시작 !!");
 
             AccessToken redisAccessToken = accessTokenService.get(accessToken);
-            log.error("[JWT ExpiredJwtException] Redis에서 AccessToken 조회 : {}", redisAccessToken);
+            String redisToken = redisAccessToken.getAccessToken();
+            String redisUserName = redisAccessToken.getUserName();
+            log.error("[JWT ExpiredJwtException] Redis에서 AccessToken 조회 : {}", redisToken);
 
-            if(redisAccessToken.getAccessToken().equals(accessToken)) { // AccessToken 비교 (Request vs Redis Server)
+            if(redisToken.equals(accessToken)) { // AccessToken 비교 (Request vs Redis Server)
                 log.error("[JWT ExpiredJwtException] 정상 만료된 토큰임을 확인");
 
-                String refreshToken = refreshTokenService.getRefreshTokenByUserName(redisAccessToken.getUserName());
+                String refreshToken = refreshTokenService.getRefreshTokenByUserName(redisUserName);
                 log.error("[JWT ExpiredJwtException] DB 조회하여 RefreshToken 조회 후 유효성 검사 : {}", refreshToken);
 
                 if(jwtUtils.isValidToken(refreshToken)) {
-
-                    String userName = jwtUtils.getUserNameFromToken(refreshToken);
-                    Account account = accountService.getAccountByUserName(userName);
-                    log.error("[JWT ExpiredJwtException] 유효한 RefreshToken 임이 확인되어 AccessToken을 재발행하기 위한 사용자 정보 조회 : {}", account);
-
-                    String newAccessToken = jwtUtils.generateToken(account, JwtConst.ACCESS_EXPIRED);
-                    log.error("[JWT ExpiredJwtException] 새로운 AccessToken 발행 : {}", newAccessToken);
-                    /* accessToken 재갱신 */
-                    accessTokenService.update(account.getUserName(), newAccessToken);
+                    log.error("[JWT ExpiredJwtException] RefreshToken 유효성 확인 -> AccessToken 재발급 시작");
+                    String newAccessToken = reAccessToken(refreshToken);
                     response.addHeader("Authorization", "Bearer " + newAccessToken);
+
                 } else {
                     /* 리프레시 토큰의 오류인 경우 -> 로그인 필요 */
                     log.error("[JWT RefreshTokenException] 리프레시 토큰 만료 -> 자원 접근 불가 (로그인 필요)");
@@ -75,9 +66,23 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         }
 
         log.info("권한에 따른 로직 필요");
-
         return true;
     }
+
+    /* AccessToken 재발급 로직 */
+    private String reAccessToken(String refreshToken) {
+
+        String userName = jwtUtils.getUserNameFromToken(refreshToken);
+        Account account = accountService.getAccountByUserName(userName);
+        log.error("[JWT ExpiredJwtException] AccessToken을 재발행하기 위한 사용자 정보 조회 : {}", account);
+
+        String newAccessToken = jwtUtils.generateToken(account, JwtConst.ACCESS_EXPIRED);
+        log.error("[JWT ExpiredJwtException] 새로운 AccessToken 발행 : {}", newAccessToken);
+
+        /* accessToken 재갱신 */
+        return accessTokenService.update(account.getUserName(), newAccessToken);
+    }
+
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
     }

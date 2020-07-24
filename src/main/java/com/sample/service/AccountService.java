@@ -1,8 +1,8 @@
 package com.sample.service;
 
-import com.sample.domain.Account;
-import com.sample.domain.AccountRepository;
-import com.sample.domain.RefreshTokenRepository;
+import com.sample.domain.account.Account;
+import com.sample.domain.account.AccountRepository;
+import com.sample.domain.refresh.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +38,7 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public Account get(String name, String pw) {
-        Account account = accountRepository.findByUserNameAndUserPw(name, pw);
-        log.info("account : {}", account);
-        return account;
+        return accountRepository.findByUserNameAndUserPw(name, pw);
     }
 
     /* 유저네임으로 사용자 조회 */
